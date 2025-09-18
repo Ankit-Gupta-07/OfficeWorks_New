@@ -275,8 +275,9 @@ public class OW_new {
         writeAllData(); //writing to CSV file
 
         driver.navigate().refresh(); //to move back to product list
-//        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(4));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(40));
         driver.findElements(By.xpath(locator.getProperty("selectOption"))).get(productCounter).click();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
         reopenTillMemory();
     }
 
