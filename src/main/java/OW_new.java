@@ -24,7 +24,7 @@ public class OW_new {
     public static BufferedWriter wr;
     public static String productName, processorName, storageName, memoryName, tradePrice;
     public static int processorSize = 0, storageSize = 0, productSize = 0, memorySize = 0, totalSize = 0, sno = 1, datafetched = 0;
-    public static int memoryCounter = 0, storageCounter = 0, processorCounter = 0, productCounter = 12, totalCounter = 0;
+    public static int memoryCounter = 0, storageCounter = 0, processorCounter = 0, productCounter = 0, totalCounter = 0;
     public static String fileName;
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -49,7 +49,8 @@ public class OW_new {
 //product selection
         driver.findElement(By.xpath(locator.getProperty("Laptops"))).click();
 //        Thread.sleep(2000);
-        System.out.println("Enter number accordingly: \n1 for Macbook\n2 for Dell Laptops\n3 for HP Laptops");
+        System.out.println("Enter number accordingly: \n1 for Macbook\n2 for Dell Laptops\n3 for HP Laptops\4 for Microsoft Laptops" +
+                "\n5 for Acer Laptops\n6 for Asus Laptops\n7 for Lenovo Laptops\n8 for Razer Laptops\n9 for Samsung Laptops");
         Scanner input = new Scanner(System.in);
         int inputValue = input.nextInt();
         //  Mapping of elemnt
@@ -57,6 +58,12 @@ public class OW_new {
         elements.put(1, driver.findElement(By.xpath(locator.getProperty("MacBook"))));
         elements.put(2, driver.findElement(By.xpath(locator.getProperty("DellLaptops"))));
         elements.put(3, driver.findElement(By.xpath(locator.getProperty("HpLaptops"))));
+        elements.put(4, driver.findElement(By.xpath(locator.getProperty("microsoftLaptops"))));
+        elements.put(5, driver.findElement(By.xpath(locator.getProperty("acerLaptops"))));
+        elements.put(6, driver.findElement(By.xpath(locator.getProperty("asusLaptops"))));
+        elements.put(7, driver.findElement(By.xpath(locator.getProperty("lenovoLaptops"))));
+        elements.put(8, driver.findElement(By.xpath(locator.getProperty("razerLaptops"))));
+        elements.put(9, driver.findElement(By.xpath(locator.getProperty("samsungLaptops"))));
         WebElement selected = elements.get(inputValue);
         fileName = selected.getText().trim().replaceAll(" ", "");
         selected.click();
