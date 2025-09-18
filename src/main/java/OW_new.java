@@ -24,7 +24,8 @@ public class OW_new {
     public static BufferedWriter wr;
     public static String productName, processorName, storageName, memoryName, tradePrice;
     public static int processorSize = 0, storageSize = 0, productSize = 0, memorySize = 0, totalSize = 0, sno = 1, datafetched = 0;
-    public static int memoryCounter = 0, storageCounter = 0, processorCounter = 0, productCounter = 0, totalCounter = 0;
+    public static int memoryCounter = 0, storageCounter = 0, processorCounter = 0, productCounter = 12, totalCounter = 0;
+    public static String fileName;
 
     public static void main(String[] args) throws IOException, InterruptedException {
 //  load all resource bundles
@@ -35,11 +36,7 @@ public class OW_new {
         FileInputStream con = new FileInputStream("src/config.properties");
         config.load(con);
 
-// Excel
-        wr = new BufferedWriter(new FileWriter("Mac.csv", false));
-        wr.write("SNO,Product Name,Processor,Storage,RAM,Trade in value");
-        wr.newLine();
-        wr.close();
+
 //  Webdriver Launch
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
@@ -47,7 +44,6 @@ public class OW_new {
         driver.get(config.getProperty("URL"));
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
 //        Thread.sleep(2000);
-
 
 
 //product selection
@@ -61,13 +57,22 @@ public class OW_new {
         elements.put(1, driver.findElement(By.xpath(locator.getProperty("MacBook"))));
         elements.put(2, driver.findElement(By.xpath(locator.getProperty("DellLaptops"))));
         elements.put(3, driver.findElement(By.xpath(locator.getProperty("HpLaptops"))));
-        WebElement selected=elements.get(inputValue);
+        WebElement selected = elements.get(inputValue);
+        fileName = selected.getText().trim().replaceAll(" ", "");
         selected.click();
+
+        // Excel
+        wr = new BufferedWriter(new FileWriter(fileName, false));
+        wr.write("SNO,Product Name,Processor,Storage,RAM,Trade in value");
+        wr.newLine();
+        wr.close();
 
 //            driver.findElement(By.xpath(locator.getProperty("MacBook"))).click();
 
         tempProductLoop();
-        processorCountLoop();
+        if (driver != null) {
+            processorCountLoop();
+        }
     }
 
     public static void tempProductLoop() throws IOException, InterruptedException {
@@ -78,6 +83,7 @@ public class OW_new {
         if (productCounter < productSize) {
             System.out.println("S.no " + (productCounter + 1) + " PRODUCT NAME: " + product.get(productCounter).getText());
             productName = product.get(productCounter).getText();          //product name stored
+            Thread.sleep(300);
             driver.findElements(By.xpath(locator.getProperty("selectOption"))).get(productCounter).click();
             //To check if product have content or not
             List<WebElement> contentCheck = new ArrayList<>();
@@ -88,7 +94,7 @@ public class OW_new {
                 System.out.println("Exception: " + e);
             }
             if (contentCheck.size() == 0) {
-                wr = new BufferedWriter(new FileWriter("Mac.csv", true));
+                wr = new BufferedWriter(new FileWriter(fileName, true));
                 wr.write(sno + "," + productName + "," + "Processor-NO DATA,Storage-NO DATA,RAM-NO DATA,Trade in value-NO DATA");
                 wr.newLine();
                 wr.close();
@@ -115,18 +121,21 @@ public class OW_new {
         } else {
             System.out.println("All product under given Category>>Brand are covered." + "\n Total product searched: " + productCounter);
             driver.quit();
+            driver = null;   // mark it as unusable
+            return;
         }
     }
 
     private static void totalSizeCalc() throws InterruptedException {
         processorList = new ArrayList<>();
         processorList = driver.findElements(By.xpath(locator.getProperty("eachButton")));
-        Thread.sleep(200);
         for (int a = 0; a < processorList.size(); a++) {
+            Thread.sleep(300);
             processorList.get(a).click();
             storageList = new ArrayList<>();
             storageList = driver.findElements(By.xpath(locator.getProperty("eachButton")));
             for (int b = processorList.size(); b < storageList.size(); b++) {
+                Thread.sleep(500);
                 storageList.get(b).click();
                 memoryList = new ArrayList<>();
                 memoryList = driver.findElements(By.xpath(locator.getProperty("eachButton")));
@@ -198,7 +207,7 @@ public class OW_new {
             totalCounter++;
             System.out.println(", Total Counter - " + totalCounter + " / " + totalSize);
             if (memoryCounter <= memorySize) {
-                wr = new BufferedWriter(new FileWriter("Mac.csv", true));
+                wr = new BufferedWriter(new FileWriter(fileName, true));
                 memoryList = driver.findElements(By.xpath(locator.getProperty("eachButton")));
 //                Thread.sleep(300);
                 memoryList.get(l).click();
@@ -228,7 +237,9 @@ public class OW_new {
 
                 driver.findElement(By.xpath(locator.getProperty("cancel"))).click();
                 tempProductLoop();
-                processorCountLoop();
+                if (driver != null) {
+                    processorCountLoop();
+                }
             }
         }
     }
@@ -263,7 +274,7 @@ public class OW_new {
     }
 
     private static void writeAllData() throws IOException {
-        wr = new BufferedWriter(new FileWriter("Mac.csv", true));
+        wr = new BufferedWriter(new FileWriter(fileName, true));
         String stringSno = Integer.toString(sno);
         wr.write(stringSno + "," + productName + "," + processorName + "," + storageName + "," + memoryName + "," + tradePrice);
         wr.newLine();
