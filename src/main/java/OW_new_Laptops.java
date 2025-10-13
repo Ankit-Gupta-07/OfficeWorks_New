@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 
-public class OW_new {
+public class OW_new_Laptops {
 
 
     public static Properties locator;
