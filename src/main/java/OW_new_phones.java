@@ -184,15 +184,43 @@ public class OW_new_phones {
     // ---------------- REOPEN LOGIC (like watches) ----------------
     public static void reopenTillStorage() throws InterruptedException {
         // HOME → PHONES → BRAND → SAME PRODUCT
+
         driver.findElement(By.xpath(locator.getProperty("phones"))).click();
-        Thread.sleep(300);
+        Thread.sleep(400);
 
         driver.findElement(By.xpath(elements.get(inputValue))).click();
-        Thread.sleep(300);
+        Thread.sleep(400);
 
-        driver.findElements(By.xpath(locator.getProperty("selectOption"))).get(productCounter).click();
-        Thread.sleep(300);
+        // Wait for product list to appear
+        List<WebElement> products = new ArrayList<>();
+        int retries = 0;
+
+        while (products.size() == 0 && retries < 10) {
+            Thread.sleep(500);
+            products = driver.findElements(By.xpath(locator.getProperty("selectOption")));
+            retries++;
+        }
+
+        if (products.size() == 0) {
+            System.out.println("⚠️ No products found after reopen. Retrying navigation...");
+            driver.navigate().refresh();
+            Thread.sleep(1000);
+            reopenTillStorage(); // retry once more
+            return;
+        }
+
+        // Ensure index is valid before clicking
+        if (productCounter < products.size()) {
+            products.get(productCounter).click();
+            Thread.sleep(400);
+        } else {
+            System.out.println("⚠️ Product index out of range. Counter=" + productCounter + ", Available=" + products.size());
+            driver.navigate().refresh();
+            Thread.sleep(1000);
+            reopenTillStorage();
+        }
     }
+
 
     // ---------------- AFTER PRODUCT COMPLETE ----------------
     public static void resetAllAfterProduct() throws IOException, InterruptedException {
